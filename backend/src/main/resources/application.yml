@@ -30,7 +30,7 @@ spring:
 
 # JWT 身份验证安全配置
 jwt:
-  secret: campushub_jwt_secret_key_2026_secure_123456
+  secret: campushub_jwt_secret_key_2026_secure_123456_campushub_jwt_secret_key_2026_secure_123456
   expiration: 86400000 # 24小时过期
 
 # AES 加解密配置
