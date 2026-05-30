@@ -1,9 +1,16 @@
 <template>
-  <el-card shadow="never" class="filter-bar">
-    <el-row :gutter="16" align="middle">
+  <div class="filter-bar">
+    <div class="filter-inner">
       <!-- 分类筛选 -->
-      <el-col :span="6">
-        <el-select v-model="filters.categoryId" placeholder="全部分类" clearable @change="emitFilter">
+      <div class="filter-item">
+        <label class="filter-label">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/>
+            <line x1="7" y1="7" x2="7.01" y2="7"/>
+          </svg>
+          分类
+        </label>
+        <el-select v-model="filters.categoryId" placeholder="全部分类" clearable @change="emitFilter" class="custom-select">
           <el-option
             v-for="cat in categories"
             :key="cat.id"
@@ -11,34 +18,68 @@
             :value="cat.id"
           />
         </el-select>
-      </el-col>
+      </div>
+
       <!-- 状态筛选 -->
-      <el-col :span="5">
-        <el-select v-model="filters.status" placeholder="全部状态" clearable @change="emitFilter">
-          <el-option label="已发布" value="published" />
+      <div class="filter-item">
+        <label class="filter-label">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+          状态
+        </label>
+        <el-select v-model="filters.status" placeholder="全部状态" clearable @change="emitFilter" class="custom-select">
+          <el-option label="待接单" value="published" />
           <el-option label="进行中" value="in_progress" />
           <el-option label="已完成" value="completed" />
         </el-select>
-      </el-col>
+      </div>
+
       <!-- 关键词搜索 -->
-      <el-col :span="7">
-        <el-input
-          v-model="filters.keyword"
-          placeholder="搜索需求标题..."
-          clearable
-          @keyup.enter="emitFilter"
-          @clear="emitFilter"
-        />
-      </el-col>
+      <div class="filter-item search-item">
+        <label class="filter-label">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/>
+            <path d="M21 21l-4.35-4.35"/>
+          </svg>
+          搜索
+        </label>
+        <div class="search-wrapper">
+          <el-input
+            v-model="filters.keyword"
+            placeholder="搜索需求标题..."
+            clearable
+            @keyup.enter="emitFilter"
+            @clear="emitFilter"
+            class="search-input"
+          />
+          <button class="search-btn" @click="emitFilter">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"/>
+              <path d="M21 21l-4.35-4.35"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
       <!-- 排序 -->
-      <el-col :span="4">
-        <el-select v-model="filters.sort" @change="emitFilter">
+      <div class="filter-item">
+        <label class="filter-label">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="4" y1="9" x2="20" y2="9"/>
+            <line x1="4" y1="15" x2="14" y2="15"/>
+            <line x1="4" y1="21" x2="8" y2="21"/>
+          </svg>
+          排序
+        </label>
+        <el-select v-model="filters.sort" @change="emitFilter" class="custom-select">
           <el-option label="最新发布" value="latest" />
           <el-option label="报酬最高" value="reward" />
         </el-select>
-      </el-col>
-    </el-row>
-  </el-card>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup>
@@ -47,7 +88,6 @@ import http from '@/common/http'
 
 const emit = defineEmits(['filter-change'])
 
-/** 筛选条件 */
 const filters = reactive({
   categoryId: null,
   status: '',
@@ -55,16 +95,13 @@ const filters = reactive({
   sort: 'latest'
 })
 
-/** 分类列表（从后端 categories 表获取） */
 const categories = reactive([])
 
-/** 加载分类下拉数据 */
 onMounted(async () => {
   try {
     const res = await http.get('/categories')
     categories.push(...res.data.data)
   } catch {
-    // 分类接口未开发时的硬编码回退
     categories.push(
       { id: 1, name: '快递代取' },
       { id: 2, name: '学习辅导' },
@@ -74,12 +111,119 @@ onMounted(async () => {
   }
 })
 
-/** 筛选项变化时通知父组件重新加载列表 */
 function emitFilter() {
   emit('filter-change', { ...filters })
 }
 </script>
 
 <style scoped>
-.filter-bar { margin-bottom: 16px; }
+.filter-bar {
+  background: var(--bg-secondary);
+  border-radius: var(--radius-xl);
+  padding: 20px 24px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+}
+
+.filter-inner {
+  display: flex;
+  align-items: flex-end;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.filter-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  min-width: 140px;
+}
+
+.filter-item.search-item {
+  flex: 2;
+  min-width: 200px;
+}
+
+.filter-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.filter-label svg {
+  width: 14px;
+  height: 14px;
+  color: var(--text-muted);
+}
+
+.custom-select {
+  width: 100%;
+}
+
+.search-wrapper {
+  display: flex;
+  gap: 8px;
+}
+
+.search-input {
+  flex: 1;
+}
+
+.search-btn {
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-base);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+  flex-shrink: 0;
+}
+
+.search-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.35);
+}
+
+.search-btn:active {
+  transform: scale(0.95);
+}
+
+.search-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+  .filter-bar {
+    padding: 16px;
+  }
+  
+  .filter-inner {
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .filter-item {
+    width: 100%;
+    min-width: 100%;
+  }
+  
+  .filter-item.search-item {
+    min-width: 100%;
+  }
+}
 </style>
